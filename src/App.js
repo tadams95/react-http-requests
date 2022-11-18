@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
+import AddMovie from "./components/AddMovie";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -9,12 +10,12 @@ function App() {
   const [error, setError] = useState(null);
 
   //using async and await functions
-  async function fetchMovieHandler() {
+  const fetchMovieHandler = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch("https://swapi.dev/api/films/");
+      const response = await fetch("https://react-http-6b403-default-rtdb.firebaseio.com/movies.json");
 
       if (!response.ok) {
         throw new Error("Something went wrong");
@@ -36,6 +37,15 @@ function App() {
       setError(error.message);
     }
     setIsLoading(false);
+  }, []);
+
+  //rending the app function upon running npm start
+  useEffect(() => {
+    fetchMovieHandler();
+  }, [fetchMovieHandler]);
+
+  function addMovieHandler(movie) {
+    console.log(movie);
   }
 
   //different content rendered based on different states.
@@ -55,6 +65,9 @@ function App() {
 
   return (
     <React.Fragment>
+      <section>
+        <AddMovie onAddMovie={addMovieHandler} />
+      </section>
       <section>
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
       </section>
